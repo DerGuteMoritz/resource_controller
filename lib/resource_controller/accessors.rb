@@ -61,7 +61,9 @@ module ResourceController # :nodoc:
             
               read_inheritable_attribute :#{accessor_name}
             end
-          
+
+            protected
+
             def #{accessor_name}(*args)
               unless args.empty?
                 self.class.write_inheritable_attribute :#{accessor_name}, args.first if args.length == 1
