@@ -16,32 +16,34 @@ module ResourceController
     end
 
     def create
-      build_object
-      load_object
-      before :create
-      if object.save
+      ActiveRecord::Base.transaction do
+        build_object
+        load_object
+        before :create
+        object.save!
         after :create
         set_flash :create
         response_for :create
-      else
-        after :create_fails
-        set_flash :create_fails
-        response_for :create_fails
       end
+    rescue ActiveRecord::RecordInvalid
+      after :create_fails
+      set_flash :create_fails
+      response_for :create_fails
     end
 
     def update
-      load_object
-      before :update
-      if object.update_attributes object_params
+      ActiveRecord::Base.transaction do
+        load_object
+        before :update
+        object.update_attributes! object_params
         after :update
         set_flash :update
         response_for :update
-      else
-        after :update_fails
-        set_flash :update_fails
-        response_for :update_fails
       end
+    rescue
+      after :update_fails
+      set_flash :update_fails
+      response_for :update_fails
     end
 
     def new
